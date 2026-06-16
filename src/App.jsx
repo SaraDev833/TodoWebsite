@@ -1,3 +1,8 @@
+//The things i need to do to complete this to do app : 1. add all the todos 2. show all the todos 3. check the finished todo 4. export them in show finished tasks 5.update todo 6. delete to do.
+
+
+
+
 import { useState } from 'react'
 
 
@@ -5,22 +10,39 @@ function App() {
  const [input, setInput] = useState("");
  const [todos, setTodos] = useState([]);
  const [showFinish , setShowFinish] = useState(false);
-
+const [editId , setEditId] = useState(false);
+const [editText , setEditText] = useState("");
 
 const filteredTasks = showFinish?todos.filter((todo)=>todo.isCompleted):todos;
 const handleChange=(e)=>{
   setInput(e.target.value);
 }
+const handleEdit=(todo)=>{
+  setEditId(todo.id);
+  setEditText(todo.text)
+}
+
 const handleSave=()=>{
   if(!input.trim()) return;
+   
 
-   const newTodo = {
+  if(editId){
+      const UpdatedTodos = todos.map((todo)=>
+    todo.id ===editId?{...todo, text:input}:todo
+  )
+   setTodos(UpdatedTodos);
+   setEditId(null);
+  
+  }else{
+       const newTodo = {
     id:Date.now(),
     text:input,
     isCompleted:false
    }
 
    setTodos([...todos, newTodo]);
+  }
+
    setInput("");
 }
 const handleCheck=(id)=>{
@@ -30,10 +52,17 @@ const handleCheck=(id)=>{
 )
 setTodos(checkedTodo)
 }
-
+const handleDelete=(id)=>{
+   const updatedTodo = todos.filter((todo)=>
+      todo.id !==id
+  
+  )
+  setTodos(updatedTodo)
+}
  
   return (
 <>
+
 <div className="min-h-screen bg-linear-to-t from-slate-950 via-blue-950 to-indigo-950 flex items-center justify-center font-edu px-4">
   
   <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6">
@@ -53,14 +82,14 @@ setTodos(checkedTodo)
       />
 
       <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition">
-        Save
+        {editId? "Update" :"save"}
       </button>
     </div>
 
     {/* Toggle */}
     
     <p onClick={()=>setShowFinish(!showFinish)} className="text-slate-300 text-sm cursor-pointer hover:text-white transition mb-6">
-      {showFinish?"show finished tasks" : "show all tasks"}
+      {showFinish?"show all tasks" : "show finish tasks"}
     </p>
 
     {/* Todo Item */}
@@ -74,10 +103,10 @@ setTodos(checkedTodo)
       </div>
 
       <div className="flex gap-2">
-        <button className="px-3 py-1 text-sm rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition">
+        <button onClick={()=>handleEdit(todo)} className="px-3 py-1 text-sm rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition">
           Edit
         </button>
-        <button className="px-3 py-1 text-sm rounded-lg bg-red-600 hover:bg-red-500 text-white transition">
+        <button onClick={()=>handleDelete(todo.id)} className="px-3 py-1 text-sm rounded-lg bg-red-600 hover:bg-red-500 text-white transition">
           Delete
         </button>
       </div>
